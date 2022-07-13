@@ -16,15 +16,15 @@ export class AlbumService {
     return await this.albumRepository.findOne(id);
   }
 
-  async createArtist(album: CreateAlbumDto): Promise<Album> {
+  async createAlbum(album: CreateAlbumDto): Promise<Album> {
     return await this.albumRepository.create(album);
   }
 
-  async updateArtist(id: string, album: UpdateAlbumDto) {
+  async updateAlbum(id: string, album: UpdateAlbumDto) {
     return await this.albumRepository.update(id, album);
   }
 
-  async deleteArtist(id: string): Promise<Album> {
+  async deleteAlbum(id: string): Promise<Album> {
     return await this.albumRepository.deleteOne(id);
   }
 }

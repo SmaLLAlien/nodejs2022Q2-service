@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   NotFoundException,
   Param,
   ParseUUIDPipe,
@@ -35,6 +36,7 @@ export class ArtistController {
   }
 
   @Post()
+  @HttpCode(201)
   async createArtist(@Body() artist: CreateArtistDto): Promise<Artist> {
     return await this.artistService.createArtist(artist);
   }
@@ -44,10 +46,15 @@ export class ArtistController {
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() artist: UpdateArtistDto,
   ): Promise<Artist> {
-    return await this.artistService.updateArtist(id, artist);
+    const updatedArtist = await this.artistService.updateArtist(id, artist);
+    if (!updatedArtist) {
+      throw new NotFoundException('Artist not found');
+    }
+    return updatedArtist;
   }
 
   @Delete(':id')
+  @HttpCode(204)
   async deleteArtist(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ): Promise<Artist> {

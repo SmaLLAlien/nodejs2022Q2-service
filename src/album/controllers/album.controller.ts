@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   NotFoundException,
   Param,
   ParseUUIDPipe,
@@ -35,8 +36,9 @@ export class AlbumController {
   }
 
   @Post()
+  @HttpCode(201)
   async createAlbum(@Body() album: CreateAlbumDto): Promise<Album> {
-    return await this.albumService.createArtist(album);
+    return await this.albumService.createAlbum(album);
   }
 
   @Put(':id')
@@ -44,14 +46,19 @@ export class AlbumController {
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() album: UpdateAlbumDto,
   ): Promise<Album> {
-    return await this.albumService.updateArtist(id, album);
+    const updatedAlbum = await this.albumService.updateAlbum(id, album);
+    if (!updatedAlbum) {
+      throw new NotFoundException('Album not found');
+    }
+    return updatedAlbum
   }
 
   @Delete(':id')
+  @HttpCode(204)
   async deleteAlbum(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ): Promise<Album> {
-    const album = await this.albumService.deleteArtist(id);
+    const album = await this.albumService.deleteAlbum(id);
 
     if (!album) {
       throw new NotFoundException('Album not found');

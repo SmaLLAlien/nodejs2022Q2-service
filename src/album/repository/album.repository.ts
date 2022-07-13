@@ -24,6 +24,9 @@ export class AlbumRepository {
 
   async update(id: string, data: UpdateAlbumDto): Promise<Album> {
     const album = this.albums.get(id);
+    if (!album) {
+      return null;
+    }
     const newAlbum = { ...album, ...data, id };
     this.albums.set(id, newAlbum);
     return newAlbum;

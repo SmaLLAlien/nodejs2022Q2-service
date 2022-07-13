@@ -24,6 +24,9 @@ export class ArtistRepository {
 
   async update(id: string, data: UpdateArtistDto): Promise<Artist> {
     const artist: Artist = this.artists.get(id);
+    if (!artist) {
+      return null;
+    }
     const newArtist: Artist = { ...artist, ...data, id };
     this.artists.set(id, newArtist);
     return newArtist;
