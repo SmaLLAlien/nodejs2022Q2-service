@@ -8,6 +8,7 @@ import { User } from '../user.entity';
 import { CreateUserDto } from '../dtos/CreateUserDto';
 import { UpdateUserDto } from '../dtos/UpdateUserDto';
 import { UserDto } from '../dtos/UserDto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -27,8 +28,11 @@ export class UserService {
       throw new BadRequestException('This login is already in use');
     }
 
+    const hashPassword = await this.hashPassword(user.password);
+
     const newUser: UserDto = {
       ...user,
+      password: hashPassword,
       version: 0,
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -42,7 +46,12 @@ export class UserService {
       return null;
     }
 
-    if (userInDb.password !== user.oldPassword) {
+    const isPasswordsEqual = await this.comparePasswords(
+      user.oldPassword,
+      userInDb.password,
+    );
+
+    if (!isPasswordsEqual) {
       throw new ForbiddenException('Old password is incorrect');
     }
 
@@ -64,5 +73,17 @@ export class UserService {
 
     await this.userRepository.deleteOne(id);
     return userInDb;
+  }
+
+  private async hashPassword(password: string): Promise<string> {
+    const salt = await bcrypt.genSalt();
+    return await bcrypt.hash(password, salt);
+  }
+
+  private async comparePasswords(
+    newPassword: string,
+    hashOldPassword: string,
+  ): Promise<boolean> {
+    return await bcrypt.compare(newPassword, hashOldPassword);
   }
 }
