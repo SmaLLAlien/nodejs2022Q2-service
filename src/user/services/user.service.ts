@@ -28,7 +28,7 @@ export class UserService {
     const newUser: UserDto = {
       ...user,
       // password: hashPassword,
-      version: 0,
+      version: 1,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };

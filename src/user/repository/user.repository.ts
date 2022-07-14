@@ -10,18 +10,24 @@ export class UserRepository {
   }
 
   async findOne(id: string): Promise<User> {
-    return this.users.get(id);
+    const userInDb = this.users.get(id);
+    if (userInDb) {
+      return this.createUserInstance(userInDb);
+    }
+
+    return null;
   }
 
   async create(user: UserDto): Promise<User> {
     const newUser: User = { id: uuidv4(), ...user };
     this.users.set(newUser.id, newUser);
-    return newUser;
+
+    return this.createUserInstance(newUser);
   }
 
   async update(id: string, newUser: User): Promise<User> {
     this.users.set(id, newUser);
-    return newUser;
+    return this.createUserInstance(newUser);
   }
 
   async deleteOne(id: string): Promise<void> {
@@ -31,5 +37,14 @@ export class UserRepository {
   async findByLogin(login: string): Promise<User> {
     const users: User[] = await this.getAll();
     return users.find((u) => u.login === login);
+  }
+
+  createUserInstance(user: User): User {
+    const newUser = new User();
+    Object.keys(user).forEach((key) => {
+      newUser[key] = user[key];
+    });
+
+    return newUser;
   }
 }

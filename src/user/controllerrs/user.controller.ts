@@ -30,7 +30,7 @@ export class UserController {
   ): Promise<User> {
     const user = await this.userService.getOne(id);
     if (!user) {
-      throw new NotFoundException('Artist not found');
+      throw new NotFoundException('User not found');
     }
     return user;
   }
@@ -48,7 +48,7 @@ export class UserController {
   ): Promise<User> {
     const updatedUser = await this.userService.updateUser(id, user);
     if (!updatedUser) {
-      throw new NotFoundException('Artist not found');
+      throw new NotFoundException('User not found');
     }
     return updatedUser;
   }
