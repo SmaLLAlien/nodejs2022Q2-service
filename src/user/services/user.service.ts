@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { UserRepository } from '../repository/user.repository';
 import { User } from '../user.entity';
 import { CreateUserDto } from '../dtos/CreateUserDto';
@@ -37,6 +41,11 @@ export class UserService {
     if (!userInDb) {
       return null;
     }
+
+    if (userInDb.password !== user.oldPassword) {
+      throw new ForbiddenException('Old password is incorrect');
+    }
+
     const newUser: User = {
       ...userInDb,
       id,
