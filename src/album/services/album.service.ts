@@ -21,7 +21,8 @@ export class AlbumService {
   }
 
   async updateAlbum(id: string, album: UpdateAlbumDto) {
-    const albumInDb = this.albumRepository.findOne(id);
+    const albumInDb: Album = await this.albumRepository.findOne(id);
+
     if (!albumInDb) {
       return null;
     }
@@ -30,7 +31,7 @@ export class AlbumService {
   }
 
   async deleteAlbum(id: string): Promise<Album> {
-    const albumInDb = this.albumRepository.findOne(id);
+    const albumInDb: Album = await this.albumRepository.findOne(id);
     if (!albumInDb) {
       return null;
     }

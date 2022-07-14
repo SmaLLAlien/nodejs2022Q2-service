@@ -19,10 +19,10 @@ import { UpdateUserDto } from '../dtos/UpdateUserDto';
 export class UserController {
   constructor(private userService: UserService) {}
 
-  // @Get()
-  // async getUsers(): Promise<User[]> {
-  //   return await this.userService.getAll();
-  // }
+  @Get()
+  async getUsers(): Promise<User[]> {
+    return await this.userService.getAll();
+  }
 
   @Get(':id')
   async getUser(
@@ -61,7 +61,7 @@ export class UserController {
     const user: User = await this.userService.deleteUser(id);
 
     if (!user) {
-      throw new NotFoundException('Artist not found');
+      throw new NotFoundException('User not found');
     }
     return user;
   }

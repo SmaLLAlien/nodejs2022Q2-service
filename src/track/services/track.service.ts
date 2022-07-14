@@ -21,7 +21,7 @@ export class TrackService {
   }
 
   async updateTrack(id: string, track: UpdateTrackDto) {
-    const trackInDb = this.trackRepository.findOne(id);
+    const trackInDb: Track = await this.trackRepository.findOne(id);
     if (!trackInDb) {
       return null;
     }
@@ -30,7 +30,7 @@ export class TrackService {
   }
 
   async deleteTrack(id: string): Promise<Track> {
-    const trackInDb = this.trackRepository.findOne(id);
+    const trackInDb: Track = await this.trackRepository.findOne(id);
     if (!trackInDb) {
       return null;
     }

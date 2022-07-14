@@ -23,16 +23,11 @@ export class UserService {
   }
 
   async createUser(user: CreateUserDto): Promise<User> {
-    const userInDb: User = await this.userRepository.findByLogin(user.login);
-    if (userInDb) {
-      throw new BadRequestException('This login is already in use');
-    }
-
-    const hashPassword = await this.hashPassword(user.password);
+    // const hashPassword = await this.hashPassword(user.password);
 
     const newUser: UserDto = {
       ...user,
-      password: hashPassword,
+      // password: hashPassword,
       version: 0,
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -46,12 +41,16 @@ export class UserService {
       return null;
     }
 
-    const isPasswordsEqual = await this.comparePasswords(
-      user.oldPassword,
-      userInDb.password,
-    );
+    // const isPasswordsEqual = await this.comparePasswords(
+    //   user.oldPassword,
+    //   userInDb.password,
+    // );
 
-    if (!isPasswordsEqual) {
+    // if (!isPasswordsEqual) {
+    //   throw new ForbiddenException('Old password is incorrect');
+    // }
+
+    if (userInDb.password !== user.oldPassword) {
       throw new ForbiddenException('Old password is incorrect');
     }
 
