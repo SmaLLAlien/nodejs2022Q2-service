@@ -21,10 +21,20 @@ export class AlbumService {
   }
 
   async updateAlbum(id: string, album: UpdateAlbumDto) {
-    return await this.albumRepository.update(id, album);
+    const albumInDb = this.albumRepository.findOne(id);
+    if (!albumInDb) {
+      return null;
+    }
+    const newAlbum: Album = { ...albumInDb, ...album, id };
+    return await this.albumRepository.update(id, newAlbum);
   }
 
   async deleteAlbum(id: string): Promise<Album> {
-    return await this.albumRepository.deleteOne(id);
+    const albumInDb = this.albumRepository.findOne(id);
+    if (!albumInDb) {
+      return null;
+    }
+    await this.albumRepository.deleteOne(id);
+    return albumInDb;
   }
 }

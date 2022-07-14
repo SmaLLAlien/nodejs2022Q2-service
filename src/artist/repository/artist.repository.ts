@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { CreateArtistDto } from '../dtos/CreateArtistDto';
 import { v4 as uuidv4 } from 'uuid';
 import { Artist } from '../artist.entity';
-import { UpdateArtistDto } from '../dtos/UpdateArtistDto';
 
 @Injectable()
 export class ArtistRepository {
@@ -22,22 +21,12 @@ export class ArtistRepository {
     return newArtist;
   }
 
-  async update(id: string, data: UpdateArtistDto): Promise<Artist> {
-    const artist: Artist = this.artists.get(id);
-    if (!artist) {
-      return null;
-    }
-    const newArtist: Artist = { ...artist, ...data, id };
+  async update(id: string, newArtist: Artist): Promise<Artist> {
     this.artists.set(id, newArtist);
     return newArtist;
   }
 
-  async deleteOne(id: string): Promise<Artist> {
-    const artist: Artist = this.artists.get(id);
-
-    if (artist) {
-      this.artists.delete(id);
-    }
-    return artist;
+  async deleteOne(id: string): Promise<void> {
+    this.artists.delete(id);
   }
 }

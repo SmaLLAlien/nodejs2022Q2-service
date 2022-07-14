@@ -21,10 +21,20 @@ export class ArtistService {
   }
 
   async updateArtist(id: string, artist: UpdateArtistDto): Promise<Artist> {
-    return await this.artistRepo.update(id, artist);
+    const artistInDb: Artist = await this.artistRepo.findOne(id);
+    if (!artistInDb) {
+      return null;
+    }
+    const newArtist: Artist = { ...artistInDb, ...artist, id };
+    return await this.artistRepo.update(id, newArtist);
   }
 
   async deleteArtist(id: string): Promise<Artist> {
-    return await this.artistRepo.deleteOne(id);
+    const artistInDb: Artist = await this.artistRepo.findOne(id);
+    if (!artistInDb) {
+      return null;
+    }
+    await this.artistRepo.deleteOne(id);
+    return artistInDb;
   }
 }

@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
 import { CreateAlbumDto } from '../dtos/CreateAlbumDto';
-import { UpdateAlbumDto } from '../dtos/UpdateAlbumDto';
 import { Album } from '../album.entity';
 import { Injectable } from '@nestjs/common';
 
@@ -22,22 +21,12 @@ export class AlbumRepository {
     return newAlbum;
   }
 
-  async update(id: string, data: UpdateAlbumDto): Promise<Album> {
-    const album = this.albums.get(id);
-    if (!album) {
-      return null;
-    }
-    const newAlbum = { ...album, ...data, id };
+  async update(id: string, newAlbum: Album): Promise<Album> {
     this.albums.set(id, newAlbum);
     return newAlbum;
   }
 
-  async deleteOne(id: string): Promise<Album> {
-    const album = this.albums.get(id);
-
-    if (album) {
-      this.albums.delete(id);
-    }
-    return album;
+  async deleteOne(id: string): Promise<void> {
+    this.albums.delete(id);
   }
 }

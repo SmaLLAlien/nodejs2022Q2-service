@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Track } from '../track.entity';
 import { CreateTrackDto } from '../dtos/CreateTrackDto';
-import { UpdateTrackDto } from '../dtos/UpdateTrackDto';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -22,22 +21,12 @@ export class TrackRepository {
     return newTrack;
   }
 
-  async update(id: string, data: UpdateTrackDto): Promise<Track> {
-    const track = this.tracks.get(id);
-    if (!track) {
-      return null;
-    }
-    const newTrack = { ...track, ...data, id };
+  async update(id: string, newTrack: Track): Promise<Track> {
     this.tracks.set(id, newTrack);
     return newTrack;
   }
 
-  async deleteOne(id: string): Promise<Track> {
-    const track = this.tracks.get(id);
-
-    if (track) {
-      this.tracks.delete(id);
-    }
-    return track;
+  async deleteOne(id: string): Promise<void> {
+    this.tracks.delete(id);
   }
 }

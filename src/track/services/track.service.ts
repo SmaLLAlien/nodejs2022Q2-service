@@ -21,10 +21,20 @@ export class TrackService {
   }
 
   async updateTrack(id: string, track: UpdateTrackDto) {
-    return await this.trackRepository.update(id, track);
+    const trackInDb = this.trackRepository.findOne(id);
+    if (!trackInDb) {
+      return null;
+    }
+    const newTrack: Track = { ...trackInDb, ...track, id };
+    return await this.trackRepository.update(id, newTrack);
   }
 
   async deleteTrack(id: string): Promise<Track> {
-    return await this.trackRepository.deleteOne(id);
+    const trackInDb = this.trackRepository.findOne(id);
+    if (!trackInDb) {
+      return null;
+    }
+    await this.trackRepository.deleteOne(id);
+    return trackInDb;
   }
 }
