@@ -51,7 +51,7 @@ export class UserService {
     // }
 
     if (userInDb.password !== user.oldPassword) {
-      throw new ForbiddenException('Old password is incorrect');
+      throw new ForbiddenException('New password is incorrect');
     }
 
     const newUser: User = {

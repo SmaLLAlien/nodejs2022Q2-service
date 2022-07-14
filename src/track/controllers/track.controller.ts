@@ -30,7 +30,7 @@ export class TrackController {
   ): Promise<Track> {
     const track: Track = await this.trackService.getOne(id);
     if (!track) {
-      throw new NotFoundException('Album not found');
+      throw new NotFoundException('Track not found');
     }
     return track;
   }
@@ -48,7 +48,7 @@ export class TrackController {
   ): Promise<Track> {
     const updatedTrack = await this.trackService.updateTrack(id, track);
     if (!updatedTrack) {
-      throw new NotFoundException('Album not found');
+      throw new NotFoundException('Track not found');
     }
     return updatedTrack;
   }
@@ -61,7 +61,7 @@ export class TrackController {
     const track = await this.trackService.deleteTrack(id);
 
     if (!track) {
-      throw new NotFoundException('Album not found');
+      throw new NotFoundException('Track not found');
     }
     return track;
   }
