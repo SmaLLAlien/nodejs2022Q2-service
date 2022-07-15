@@ -6,5 +6,6 @@ import { TrackRepository } from './repository/track.repository';
 @Module({
   providers: [TrackService, TrackRepository],
   controllers: [TrackController],
+  exports: [TrackService],
 })
 export class TrackModule {}
