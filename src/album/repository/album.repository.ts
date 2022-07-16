@@ -29,4 +29,16 @@ export class AlbumRepository {
   async deleteOne(id: string): Promise<void> {
     this.albums.delete(id);
   }
+
+  async findByArtist(artistId: string): Promise<Album[]> {
+    const allAlbums = await this.getAll();
+    const albums = allAlbums.filter((album) => album.artistId === artistId);
+    return albums;
+  }
+
+  async findByKey(keyName: string, keyValue: any): Promise<Album[]> {
+    const allAlbums = await this.getAll();
+    const albums = allAlbums.filter((album) => album[keyName] === keyValue);
+    return albums;
+  }
 }

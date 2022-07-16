@@ -29,4 +29,10 @@ export class TrackRepository {
   async deleteOne(id: string): Promise<void> {
     this.tracks.delete(id);
   }
+
+  async findByKey(keyName: string, keyValue: any): Promise<Track[]> {
+    const allAlbums = await this.getAll();
+    const tracks = allAlbums.filter((album) => album[keyName] === keyValue);
+    return tracks;
+  }
 }
