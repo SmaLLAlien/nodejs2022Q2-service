@@ -50,7 +50,7 @@ export class AlbumController {
     if (!updatedAlbum) {
       throw new NotFoundException('Album not found');
     }
-    return updatedAlbum
+    return updatedAlbum;
   }
 
   @Delete(':id')
