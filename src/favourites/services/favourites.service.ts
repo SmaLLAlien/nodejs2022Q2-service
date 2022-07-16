@@ -34,7 +34,7 @@ export class FavouritesService {
   }
 
   async addArtist(artistId: string) {
-    const isArtistExist = await this.isArtistExist(artistId);
+    const isArtistExist: boolean = await this.isArtistExist(artistId);
     if (!isArtistExist) {
       return null;
     }
@@ -43,7 +43,7 @@ export class FavouritesService {
   }
 
   async deleteArtist(artistId: string) {
-    const isArtistExist = await this.isArtistExist(artistId);
+    const isArtistExist: boolean = await this.isArtistExist(artistId);
     if (!isArtistExist) {
       return null;
     }
@@ -52,7 +52,7 @@ export class FavouritesService {
   }
 
   async addTrack(trackId: string) {
-    const isTrackExist = await this.isTrackExist(trackId);
+    const isTrackExist: boolean = await this.isTrackExist(trackId);
     if (!isTrackExist) {
       return null;
     }
@@ -61,7 +61,7 @@ export class FavouritesService {
   }
 
   async deleteTrack(trackId: string) {
-    const isTrackExist = await this.isTrackExist(trackId);
+    const isTrackExist: boolean = await this.isTrackExist(trackId);
     if (!isTrackExist) {
       return null;
     }
@@ -70,7 +70,7 @@ export class FavouritesService {
   }
 
   async addAlbum(albumId: string) {
-    const isAlbumExist = await this.isAlbumExist(albumId);
+    const isAlbumExist: boolean = await this.isAlbumExist(albumId);
     if (!isAlbumExist) {
       return null;
     }
@@ -79,7 +79,7 @@ export class FavouritesService {
   }
 
   async deleteAlbum(albumId: string) {
-    const isAlbumExist = await this.isAlbumExist(albumId);
+    const isAlbumExist: boolean = await this.isAlbumExist(albumId);
     if (!isAlbumExist) {
       return null;
     }
@@ -92,12 +92,12 @@ export class FavouritesService {
     return !!artist;
   }
 
-  private async isTrackExist(trackId: string) {
+  private async isTrackExist(trackId: string): Promise<boolean> {
     const track = await this.trackService.getOne(trackId);
     return !!track;
   }
 
-  private async isAlbumExist(albumId: string) {
+  private async isAlbumExist(albumId: string): Promise<boolean> {
     const album = await this.albumService.getOne(albumId);
     return !!album;
   }
@@ -108,7 +108,7 @@ export class FavouritesService {
       artists = await Promise.all(
         artistIds.map((id) => this.artistService.getOne(id)),
       );
-      return artists;
+      return artists.filter((a) => !!a);
     } catch (e) {
       console.log(`Could not get artists. [Error]: ${e.message}`);
       return [];
@@ -121,7 +121,7 @@ export class FavouritesService {
       albums = await Promise.all(
         albumIds.map((id) => this.albumService.getOne(id)),
       );
-      return albums;
+      return albums.filter((a) => !!a);
     } catch (e) {
       console.log(`Could not get albums. [Error]: ${e.message}`);
       return [];
@@ -135,7 +135,7 @@ export class FavouritesService {
         trackIds.map((id) => this.trackService.getOne(id)),
       );
 
-      return tracks;
+      return tracks.filter((t) => !!t);
     } catch (e) {
       console.log(`Could not get tracks. [Error]: ${e.message}`);
       return [];
