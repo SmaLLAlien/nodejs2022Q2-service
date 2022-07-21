@@ -1,15 +1,17 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { AlbumRepository } from '../repository/album.repository';
 import { CreateAlbumDto } from '../dtos/CreateAlbumDto';
 import { UpdateAlbumDto } from '../dtos/UpdateAlbumDto';
 import { Album } from '../album.entity';
 import { TrackService } from '../../track/services/track.service';
 import { FavouritesService } from '../../favourites/services/favourites.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AlbumService {
   constructor(
-    private albumRepository: AlbumRepository,
+    @InjectRepository(Album)
+    private albumRepo: Repository<Album>,
     @Inject(forwardRef(() => TrackService))
     private trackService: TrackService,
     @Inject(forwardRef(() => FavouritesService))
@@ -17,40 +19,49 @@ export class AlbumService {
   ) {}
 
   async getAll(): Promise<Album[]> {
-    return await this.albumRepository.getAll();
+    return await this.albumRepo.find();
   }
 
   async getOne(id: string): Promise<Album> {
-    return await this.albumRepository.findOne(id);
+    return await this.albumRepo.findOne({ where: { id } });
   }
 
   async createAlbum(album: CreateAlbumDto): Promise<Album> {
-    return await this.albumRepository.create(album);
+    const newAlbum = this.albumRepo.create(album);
+    return await this.albumRepo.save(newAlbum);
   }
 
-  async updateAlbum(id: string, album: UpdateAlbumDto) {
-    const albumInDb: Album = await this.albumRepository.findOne(id);
+  async updateAlbum(id: string, album: UpdateAlbumDto): Promise<Album> {
+    const albumInDb: Album = await this.albumRepo.findOne({ where: { id } });
 
     if (!albumInDb) {
       return null;
     }
-    const newAlbum: Album = { ...albumInDb, ...album, id };
-    return await this.albumRepository.update(id, newAlbum);
+    const newAlbum: Album = await this.albumRepo.create({
+      ...albumInDb,
+      ...album,
+      id,
+    });
+    return await this.albumRepo.save(newAlbum);
   }
 
   async deleteAlbum(id: string): Promise<Album> {
-    const albumInDb: Album = await this.albumRepository.findOne(id);
+    const albumInDb: Album = await this.albumRepo.findOne({ where: { id } });
     if (!albumInDb) {
       return null;
     }
-    await this.albumRepository.deleteOne(id);
+    await this.albumRepo.delete(id);
+
+    // TODO check relations
     await this.trackService.deleteKey('albumId', id);
     await this.favsService.deleteAlbum(id);
     return albumInDb;
   }
 
   async findByKey(keyName: string, keyValue: any): Promise<Album[]> {
-    const albums = await this.albumRepository.findByKey(keyName, keyValue);
+    const albums = await this.albumRepo.find({
+      where: { [keyName]: [keyValue] },
+    });
     return albums;
   }
 

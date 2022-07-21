@@ -3,40 +3,42 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import { UserRepository } from '../repository/user.repository';
 import { User } from '../user.entity';
 import { CreateUserDto } from '../dtos/CreateUserDto';
 import { UpdateUserDto } from '../dtos/UpdateUserDto';
 import { UserDto } from '../dtos/UserDto';
 import * as bcrypt from 'bcrypt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    @InjectRepository(User)
+    private userRepo: Repository<User>,
+  ) {}
 
   async getAll(): Promise<User[]> {
-    return await this.userRepository.getAll();
+    return await this.userRepo.find();
   }
 
   async getOne(id: string): Promise<User> {
-    return await this.userRepository.findOne(id);
+    return await this.userRepo.findOne({ where: { id } });
   }
 
   async createUser(user: CreateUserDto): Promise<User> {
     // const hashPassword = await this.hashPassword(user.password);
 
-    const newUser: UserDto = {
+    const newUser: UserDto = this.userRepo.create({
       ...user,
       // password: hashPassword,
       version: 1,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    };
-    return await this.userRepository.create(newUser);
+    });
+    return await this.userRepo.save(newUser);
   }
 
   async updateUser(id: string, user: UpdateUserDto): Promise<User> {
-    const userInDb: User = await this.userRepository.findOne(id);
+    const userInDb: User = await this.userRepo.findOne({ where: { id } });
     if (!userInDb) {
       return null;
     }
@@ -54,23 +56,22 @@ export class UserService {
       throw new ForbiddenException('New password is incorrect');
     }
 
-    const newUser: User = {
+    const newUser: User = this.userRepo.create({
       ...userInDb,
       id,
       password: user.newPassword,
       version: (userInDb.version += 1),
-      updatedAt: Date.now(),
-    };
-    return await this.userRepository.update(id, newUser);
+    });
+    return await this.userRepo.save(newUser);
   }
 
   async deleteUser(id: string): Promise<User> {
-    const userInDb: User = await this.userRepository.findOne(id);
+    const userInDb: User = await this.userRepo.findOne({ where: { id } });
     if (!userInDb) {
       return null;
     }
 
-    await this.userRepository.deleteOne(id);
+    await this.userRepo.delete(id);
     return userInDb;
   }
 
