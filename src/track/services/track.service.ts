@@ -48,8 +48,6 @@ export class TrackService {
     }
     await this.trackRepo.delete(id);
 
-    // TODO check relations
-    await this.favsService.deleteTrack(id);
     return trackInDb;
   }
 

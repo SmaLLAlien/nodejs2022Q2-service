@@ -1,4 +1,4 @@
-import { Exclude } from 'class-transformer';
+import { Exclude, Transform } from 'class-transformer';
 import {
   Column,
   Entity,
@@ -23,8 +23,10 @@ export class User {
   version: number;
 
   @CreateDateColumn()
+  @Transform(({ value }) => new Date(value).getTime())
   createdAt: number;
 
   @UpdateDateColumn()
+  @Transform(({ value }) => new Date(value).getTime())
   updatedAt: number;
 }

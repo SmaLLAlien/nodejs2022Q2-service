@@ -58,10 +58,6 @@ export class ArtistService {
     }
     await this.artistRepository.delete(id);
 
-    // TODO check relations
-    await this.albumService.deleteKey('artistId', id);
-    await this.trackService.deleteKey('artistId', id);
-    await this.favsService.deleteArtist(id);
     return artistInDb;
   }
 }

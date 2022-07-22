@@ -52,9 +52,6 @@ export class AlbumService {
     }
     await this.albumRepo.delete(id);
 
-    // TODO check relations
-    await this.trackService.deleteKey('albumId', id);
-    await this.favsService.deleteAlbum(id);
     return albumInDb;
   }
 

@@ -8,6 +8,6 @@ export class Artist {
   @Column()
   name: string;
 
-  @Column()
+  @Column('boolean')
   grammy: boolean;
 }

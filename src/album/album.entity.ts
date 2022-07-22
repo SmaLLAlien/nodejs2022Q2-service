@@ -1,4 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Artist } from '../artist/artist.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity('Album')
 export class Album {
@@ -13,4 +21,9 @@ export class Album {
 
   @Column({ nullable: true })
   artistId: string | null;
+
+  @OneToOne(() => Artist, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn()
+  @Exclude()
+  artist: Artist;
 }
