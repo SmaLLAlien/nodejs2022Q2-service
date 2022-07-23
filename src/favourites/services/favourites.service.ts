@@ -43,7 +43,6 @@ export class FavouritesService {
 
   async getFavourite() {
     let favourites = await this.favsRepos.findOne({ where: {} });
-    console.log(favourites, 3434343);
     if (!favourites) {
       favourites = this.favsRepos.create({
         artists: [],
