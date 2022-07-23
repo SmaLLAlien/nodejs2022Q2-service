@@ -4,13 +4,17 @@ services:
   db:
     container_name: nodejs2022Q2-db
     image: postgres:14.0-alpine
-    restart: always
+    build:
+      context: .
+      dockerfile: ./database/Dockerfile
+    restart: unless-stopped
     environment:
       - POSTGRES_USER=${TYPEORM_USERNAME}
       - POSTGRES_PASSWORD=${TYPEORM_PASSWORD}
       - POSTGRES_DB=${TYPEORM_DATABASE}
     volumes:
       - ./pgdata:/var/lib/postgresql/data
+      - ./pglogs:/var/log/postgresql/postgresql.log
     ports:
       - ${TYPEORM_PORT}:${TYPEORM_PORT}
 
@@ -21,7 +25,7 @@ services:
       dockerfile: ./Dockerfile
     depends_on:
       - db
-    restart: always
+    restart: unless-stopped
     ports:
       - ${PORT}:${PORT}
     environment:
@@ -32,6 +36,9 @@ services:
       - TYPEORM_DATABASE=${TYPEORM_DATABASE}
       - TYPEORM_PORT=${TYPEORM_PORT}
       - TYPEORM_HOST=db
+    volumes:
+      - .:/usr/app/
+      - /usr/app/node_modules
 
 networks:
   db:

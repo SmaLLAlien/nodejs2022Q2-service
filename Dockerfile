@@ -1,13 +1,15 @@
 FROM node:lts-alpine
 
-WORKDIR /app
+WORKDIR /usr/app/
 
-COPY package.json /app
+COPY package*.json ./
 
 RUN npm install
 
 COPY . .
 
+COPY .env.example .env
+
 EXPOSE ${PORT}
 
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start:dev"]
