@@ -1,13 +1,12 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TrackService } from './services/track.service';
 import { TrackController } from './controllers/track.controller';
-import { TrackRepository } from './repository/track.repository';
 import { FavouritesModule } from '../favourites/favourites.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Track } from './track.entity';
 
 @Module({
-  providers: [TrackService, TrackRepository],
+  providers: [TrackService],
   controllers: [TrackController],
   exports: [TrackService],
   imports: [
