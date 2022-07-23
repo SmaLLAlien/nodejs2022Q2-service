@@ -1,22 +1,13 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateArtistDto } from '../dtos/CreateArtistDto';
 import { UpdateArtistDto } from '../dtos/UpdateArtistDto';
 import { Artist } from '../artist.entity';
-import { AlbumService } from '../../album/services/album.service';
-import { TrackService } from '../../track/services/track.service';
-import { FavouritesService } from '../../favourites/services/favourites.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class ArtistService {
   constructor(
-    @Inject(forwardRef(() => AlbumService))
-    private albumService: AlbumService,
-    @Inject(forwardRef(() => TrackService))
-    private trackService: TrackService,
-    @Inject(forwardRef(() => FavouritesService))
-    private favsService: FavouritesService,
     @InjectRepository(Artist)
     private artistRepository: Repository<Artist>,
   ) {}

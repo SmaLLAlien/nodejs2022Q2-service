@@ -1,8 +1,7 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Track } from '../track.entity';
 import { UpdateTrackDto } from '../dtos/UpdateTrackDto';
 import { CreateTrackDto } from '../dtos/CreateTrackDto';
-import { FavouritesService } from '../../favourites/services/favourites.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -11,8 +10,6 @@ export class TrackService {
   constructor(
     @InjectRepository(Track)
     private trackRepo: Repository<Track>,
-    @Inject(forwardRef(() => FavouritesService))
-    private favsService: FavouritesService,
   ) {}
 
   async getAll(): Promise<Track[]> {
@@ -49,24 +46,5 @@ export class TrackService {
     await this.trackRepo.delete(id);
 
     return trackInDb;
-  }
-
-  async findByKey(keyName: string, keyValue: any): Promise<Track[]> {
-    const tracks = await this.trackRepo.find({
-      where: { [keyName]: [keyValue] },
-    });
-    return tracks;
-  }
-
-  async deleteKey(keyName: string, keyValue: any): Promise<void> {
-    const tracks = await this.findByKey(keyName, keyValue);
-    if (tracks.length) {
-      tracks.forEach((track) => {
-        track[keyName] = null;
-      });
-      await Promise.all(
-        tracks.map((track) => this.updateTrack(track.id, track)),
-      );
-    }
   }
 }
