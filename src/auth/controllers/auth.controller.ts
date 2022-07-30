@@ -1,4 +1,10 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { SignUpDto } from '../dtos/SignUpDto';
 import { AuthService } from '../services/auth.service';
 import { RefreshTokenDto } from '../dtos/RefreshTokenDto';
@@ -24,6 +30,9 @@ export class AuthController {
 
   @Post('refresh')
   async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
+    if (!refreshTokenDto?.refresh_token) {
+      throw new UnauthorizedException('Refresh token is required');
+    }
     return await this.authService.refreshToken(refreshTokenDto);
   }
 }
