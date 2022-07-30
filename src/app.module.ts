@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
@@ -8,14 +8,16 @@ import { AlbumModule } from './album/album.module';
 import { FavouritesModule } from './favourites/favourites.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
-    forwardRef(() => UserModule),
-    forwardRef(() => ArtistModule),
-    forwardRef(() => TrackModule),
-    forwardRef(() => AlbumModule),
-    forwardRef(() => FavouritesModule),
+    UserModule,
+    ArtistModule,
+    TrackModule,
+    AlbumModule,
+    FavouritesModule,
+    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
