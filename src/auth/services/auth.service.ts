@@ -28,7 +28,7 @@ export class AuthService {
 
   async signup(
     user: CreateUserDto,
-  ): Promise<{ token: string; refresh_token: string }> {
+  ): Promise<{ accessToken: string; refresh_token: string }> {
     const userInDb = await this.userService.find(user.login);
 
     if (userInDb) {
@@ -44,21 +44,21 @@ export class AuthService {
 
     await this.userService.createUser(newUser);
 
-    const token = this.generateToken(userInDb.id, userInDb.login);
+    const accessToken = this.generateToken(userInDb.id, userInDb.login);
     const refresh_token = this.generateRefreshToken(
       userInDb.id,
       userInDb.login,
     );
 
     return {
-      token,
+      accessToken,
       refresh_token,
     };
   }
 
   async signin(
     user: CreateUserDto,
-  ): Promise<{ token: string; refresh_token: string }> {
+  ): Promise<{ accessToken: string; refresh_token: string }> {
     const userInDb: User = await this.userService.find(user.login);
 
     if (!userInDb) {
@@ -74,21 +74,21 @@ export class AuthService {
       throw new ForbiddenException('Password is incorrect');
     }
 
-    const token = this.generateToken(userInDb.id, userInDb.login);
+    const accessToken = this.generateToken(userInDb.id, userInDb.login);
     const refresh_token = this.generateRefreshToken(
       userInDb.id,
       userInDb.login,
     );
 
     return {
-      token,
+      accessToken,
       refresh_token,
     };
   }
 
   async refreshToken({
     refresh_token,
-  }: RefreshTokenDto): Promise<{ token: string; refresh_token: string }> {
+  }: RefreshTokenDto): Promise<{ accessToken: string; refresh_token: string }> {
     try {
       const options: JwtVerifyOptions = {
         secret: this.configService.get('JWT_SECRET_REFRESH_KEY'),
@@ -102,13 +102,13 @@ export class AuthService {
         throw new ForbiddenException('Refresh token is expired');
       }
 
-      const token = this.generateToken(payload.userId, payload.login);
+      const accessToken = this.generateToken(payload.userId, payload.login);
       const refreshToken = this.generateRefreshToken(
         payload.userId,
         payload.login,
       );
       return {
-        token,
+        accessToken,
         refresh_token: refreshToken,
       };
     } catch (e) {
@@ -152,12 +152,12 @@ export class AuthService {
       secret: this.configService.get<string>('JWT_SECRET_KEY'),
       expiresIn: this.configService.get<string>('TOKEN_EXPIRE_TIME'),
     };
-    const token: string = this.jwtTokenService.sign(
+    const accessToken: string = this.jwtTokenService.sign(
       { userId, login: userLogin },
       options,
     );
 
-    return token;
+    return accessToken;
   }
 
   private generateRefreshToken(userId: string, userLogin: string): string {

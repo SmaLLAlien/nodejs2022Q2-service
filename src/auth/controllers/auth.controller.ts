@@ -17,19 +17,21 @@ export class AuthController {
   @HttpCode(201)
   async signup(
     @Body() user: SignUpDto,
-  ): Promise<{ token: string; refresh_token: string }> {
+  ): Promise<{ accessToken: string; refresh_token: string }> {
     return await this.authService.signup(user);
   }
 
   @Post('login')
   async signin(
     @Body() user: SignUpDto,
-  ): Promise<{ token: string; refresh_token: string }> {
+  ): Promise<{ accessToken: string; refresh_token: string }> {
     return await this.authService.signin(user);
   }
 
   @Post('refresh')
-  async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
+  async refreshToken(
+    @Body() refreshTokenDto: RefreshTokenDto,
+  ): Promise<{ accessToken: string; refresh_token: string }> {
     if (!refreshTokenDto?.refresh_token) {
       throw new UnauthorizedException('Refresh token is required');
     }
