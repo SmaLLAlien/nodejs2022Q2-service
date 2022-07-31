@@ -1,53 +1,42 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { UserService } from '../../user/services/user.service';
 import { ConfigService } from '@nestjs/config';
 import { CreateUserDto } from '../../user/dtos/CreateUserDto';
 import { User } from '../../user/user.entity';
-import * as bcrypt from 'bcrypt';
 import { JwtService, JwtVerifyOptions } from '@nestjs/jwt';
 import { JwtSignOptions } from '@nestjs/jwt/dist/interfaces/jwt-module-options.interface';
 import { RefreshTokenDto } from '../dtos/RefreshTokenDto';
 import { TokenDto } from '../dtos/TokenDto';
+import { CryptService } from './crypt.service';
 
 @Injectable()
 export class AuthService {
-  private readonly saltRound: number;
-
   constructor(
     private userService: UserService,
     private configService: ConfigService,
     private jwtTokenService: JwtService,
-  ) {
-    const CRYPT_SALT = +this.configService.get<string>('CRYPT_SALT');
-    this.saltRound = isNaN(CRYPT_SALT) ? 10 : CRYPT_SALT;
-  }
+    private cryptService: CryptService,
+  ) {}
 
   async signup(
     user: CreateUserDto,
   ): Promise<{ accessToken: string; refresh_token: string }> {
     const userInDb = await this.userService.find(user.login);
 
-    if (userInDb) {
-      throw new BadRequestException('Login in use');
-    }
-
-    const hashPassword = await this.hashPassword(user.password);
+    // if (userInDb) {
+    //   throw new BadRequestException('Login in use');
+    // }
 
     const newUser: CreateUserDto = {
       ...user,
-      password: hashPassword,
     };
 
-    await this.userService.createUser(newUser);
+    const newUserDb: User = await this.userService.createUser(newUser);
 
-    const accessToken = this.generateToken(userInDb.id, userInDb.login);
+    const accessToken = this.generateToken(newUserDb.id, newUserDb.login);
     const refresh_token = this.generateRefreshToken(
-      userInDb.id,
-      userInDb.login,
+      newUserDb.id,
+      newUserDb.login,
     );
 
     return {
@@ -65,7 +54,7 @@ export class AuthService {
       throw new ForbiddenException('Not found user');
     }
 
-    const isPasswordsEqual = await this.comparePasswords(
+    const isPasswordsEqual = this.cryptService.comparePasswords(
       user.password,
       userInDb.password,
     );
@@ -133,18 +122,6 @@ export class AuthService {
       console.log(e.message);
       throw new ForbiddenException('Token is invalid');
     }
-  }
-
-  private async hashPassword(password: string): Promise<string> {
-    const salt = await bcrypt.genSalt(this.saltRound);
-    return await bcrypt.hash(password, salt);
-  }
-
-  private async comparePasswords(
-    loginPassword: string,
-    dbPassword: string,
-  ): Promise<boolean> {
-    return await bcrypt.compare(loginPassword, dbPassword);
   }
 
   private generateToken(userId: string, userLogin: string): string {
