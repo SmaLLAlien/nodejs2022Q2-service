@@ -14,7 +14,7 @@ export class LoggerMiddleware implements NestMiddleware {
     response.on('finish', () => {
       const { statusCode } = response;
 
-      this.customLogger.info(
+      this.customLogger.infoLog(
         `${method} ${originalUrl} ${statusCode} - [BODY]: ${bodyString} [QUERY]: ${queryString}`,
       );
     });

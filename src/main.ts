@@ -4,6 +4,7 @@ import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 import { CustomLoggerService } from './logger/services/custom-logger.service';
+import { HttpExceptionFilter } from './filters/http-exception-filter';
 
 async function bootstrap() {
   const logger = new Logger('main');
@@ -19,6 +20,7 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   app.useLogger(new CustomLoggerService());
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   const configService = app.get(ConfigService);
   const PORT = configService.get<number>('PORT');
