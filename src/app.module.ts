@@ -12,6 +12,8 @@ import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { CurrentUserMiddleware } from './auth/middlewares/current-user.middleware';
 import { AuthGuard } from './auth/guards/auth.guard';
+import { LoggerModule } from './logger/logger.module';
+import { LoggerMiddleware } from './logger/logger.middleware';
 
 @Module({
   imports: [
@@ -43,6 +45,7 @@ import { AuthGuard } from './auth/guards/auth.guard';
         };
       },
     }),
+    LoggerModule,
   ],
   controllers: [AppController],
   providers: [
@@ -57,5 +60,6 @@ import { AuthGuard } from './auth/guards/auth.guard';
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(CurrentUserMiddleware).forRoutes('*');
+    consumer.apply(LoggerMiddleware).forRoutes('*');
   }
 }
