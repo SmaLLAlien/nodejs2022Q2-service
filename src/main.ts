@@ -4,7 +4,6 @@ import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 import { CustomLoggerService } from './logger/services/custom-logger.service';
-import { HttpExceptionFilter } from './filters/http-exception-filter';
 import { dirname, join } from 'path';
 import { parse } from 'yaml';
 import { readFile } from 'fs/promises';
@@ -23,11 +22,12 @@ async function bootstrap() {
   );
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-  app.useLogger(new CustomLoggerService());
-  app.useGlobalFilters(new HttpExceptionFilter());
 
   const configService = app.get(ConfigService);
   const PORT = configService.get<number>('PORT');
+
+  const customLogger = new CustomLoggerService(configService);
+  app.useLogger(customLogger);
 
   const rootDirname = dirname(__dirname);
   const DOC_API = await readFile(join(rootDirname, 'doc', 'api.yaml'), 'utf-8');
@@ -39,6 +39,16 @@ async function bootstrap() {
   console.log('************************************************************\n');
   logger.log(`Service is ready to receive messages on PORT - ${PORT}\n`);
   console.log('************************************************************\n');
+
+  process.on('uncaughtException', (err) => {
+    customLogger.error(`uncaughtException: ${err.message}`);
+
+    process.exit(1);
+  });
+
+  process.on('unhandledRejection', (err: any) => {
+    customLogger.error(`Unhandled Rejection at Promise: ${err.message}`);
+  });
 }
 
 bootstrap();

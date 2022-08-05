@@ -30,6 +30,7 @@ services:
       - ${PORT}:${PORT}
     environment:
       - PORT=${PORT}
+      - MAX_FILE_SIZE=${MAX_FILE_SIZE}
       - CRYPT_SALT=${CRYPT_SALT}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - JWT_SECRET_REFRESH_KEY=${JWT_SECRET_REFRESH_KEY}

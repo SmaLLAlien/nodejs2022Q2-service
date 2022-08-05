@@ -8,6 +8,7 @@ import { JwtSignOptions } from '@nestjs/jwt/dist/interfaces/jwt-module-options.i
 import { RefreshTokenDto } from '../dtos/RefreshTokenDto';
 import { TokenDto } from '../dtos/TokenDto';
 import { CryptService } from './crypt.service';
+import { CustomLoggerService } from '../../logger/services/custom-logger.service';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +17,7 @@ export class AuthService {
     private configService: ConfigService,
     private jwtTokenService: JwtService,
     private cryptService: CryptService,
+    private logger: CustomLoggerService,
   ) {}
 
   async signup(
@@ -101,7 +103,7 @@ export class AuthService {
         refresh_token: refreshToken,
       };
     } catch (e) {
-      console.log(e.message);
+      this.logger.errorLog(`refreshToken(): ${e.message}`);
       throw new ForbiddenException('Refresh token is invalid');
     }
   }
@@ -119,7 +121,7 @@ export class AuthService {
 
       return payload;
     } catch (e) {
-      console.log(e.message);
+      this.logger.errorLog(`[getDataFromAccessToken]: ${e.message}`);
       throw new ForbiddenException('Token is invalid');
     }
   }

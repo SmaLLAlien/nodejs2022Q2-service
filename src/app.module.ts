@@ -9,11 +9,12 @@ import { FavouritesModule } from './favourites/favourites.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { CurrentUserMiddleware } from './auth/middlewares/current-user.middleware';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { LoggerModule } from './logger/logger.module';
 import { LoggerMiddleware } from './logger/logger.middleware';
+import { HttpExceptionFilter } from './filters/http-exception-filter';
 
 @Module({
   imports: [
@@ -53,6 +54,10 @@ import { LoggerMiddleware } from './logger/logger.middleware';
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
     },
     // { provide: APP_INTERCEPTOR, useClass: CurrentUserInterceptor },
   ],

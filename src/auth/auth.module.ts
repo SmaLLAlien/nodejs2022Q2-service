@@ -5,9 +5,10 @@ import { AuthController } from './controllers/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
 import { CryptService } from './services/crypt.service';
+import { LoggerModule } from '../logger/logger.module';
 
 @Module({
-  imports: [forwardRef(() => UserModule), JwtModule],
+  imports: [forwardRef(() => UserModule), JwtModule, LoggerModule],
   controllers: [AuthController],
   providers: [AuthService, CurrentUserInterceptor, CryptService],
   exports: [CurrentUserInterceptor, AuthService, CryptService],
