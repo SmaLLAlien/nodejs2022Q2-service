@@ -42,7 +42,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const { body, query, method, originalUrl } = request;
     const bodyString = JSON.stringify(body);
     const queryString = JSON.stringify(query);
-    const loggerMessage = `${new Date().toISOString()} [HttpExceptionFilter]: ${message} ${method} ${originalUrl} ${status} - [BODY]: ${bodyString} [QUERY]: ${queryString}`;
+    const loggerMessage = `[HttpExceptionFilter]: ${message} ${method} ${originalUrl} ${status} - [BODY]: ${bodyString} [QUERY]: ${queryString}`;
     this.logger.errorLog(loggerMessage);
   }
 }

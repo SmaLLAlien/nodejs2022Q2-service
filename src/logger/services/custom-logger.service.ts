@@ -50,15 +50,17 @@ export class CustomLoggerService extends ConsoleLogger {
   private async logToFile(msg: string, type: logTypes) {
     let path = resolve(`${this.logsDirectory}/${type}-${this.file}.log`);
 
+    const message = `${new Date().toISOString()} ${msg}\n`;
+
     if (this.getFileSize(path) > this.maxSize) {
       this.file = `log-${Date.now()}`;
       path = resolve(`${this.logsDirectory}/${type}-${this.file}.log`);
     }
 
     if (!this.isExist(path)) {
-      await writeFile(path, msg, { flag: 'wx', encoding: 'utf-8' });
+      await writeFile(path, message, { flag: 'wx', encoding: 'utf-8' });
     } else {
-      await appendFile(path, msg, { encoding: 'utf-8' });
+      await appendFile(path, message, { encoding: 'utf-8' });
     }
   }
 
