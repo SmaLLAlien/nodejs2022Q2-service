@@ -12,3 +12,6 @@ BRANCH NAME = typeorm;
 1. run docker from  docker-bd-compose.yml
 2. run ```npm install```
 3. run ```npm run:start```
+
+### hints
+Log files are in the log directory at project root.
