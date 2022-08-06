@@ -4,6 +4,7 @@ import { writeFile, appendFile } from 'fs/promises';
 import { resolve } from 'path';
 import { logTypes } from '../../config/config';
 import { ConfigService } from '@nestjs/config';
+import { getLogLevels } from '../getLogLevels';
 
 @Injectable()
 export class CustomLoggerService extends ConsoleLogger {
@@ -17,6 +18,8 @@ export class CustomLoggerService extends ConsoleLogger {
       this.createDirectory();
     }
     this.maxSize = this.configService.get('MAX_FILE_SIZE');
+    const logLevel = this.configService.get('LOG_LEVEL');
+    this.setLogLevels(getLogLevels(logLevel));
   }
 
   infoLog(message: string): void {
