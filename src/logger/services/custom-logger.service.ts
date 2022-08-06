@@ -1,11 +1,11 @@
-import { ConsoleLogger, Injectable, Scope } from '@nestjs/common';
+import { ConsoleLogger, Injectable } from '@nestjs/common';
 import { statSync, mkdirSync, existsSync } from 'fs';
 import { writeFile, appendFile } from 'fs/promises';
 import { resolve } from 'path';
 import { logTypes } from '../../config/config';
 import { ConfigService } from '@nestjs/config';
 
-@Injectable({ scope: Scope.TRANSIENT })
+@Injectable()
 export class CustomLoggerService extends ConsoleLogger {
   private maxSize = 1024;
   private logsDirectory = `${process.cwd()}/logs`;

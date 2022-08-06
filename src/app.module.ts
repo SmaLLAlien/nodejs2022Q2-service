@@ -42,7 +42,7 @@ import { HttpExceptionFilter } from './filters/http-exception-filter';
           entities: [__dirname + 'dist/**/*.entity{.ts,.js}'],
           synchronize: true,
           autoLoadEntities: true,
-          logging: true,
+          // logging: true,
         };
       },
     }),

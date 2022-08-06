@@ -26,7 +26,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const PORT = configService.get<number>('PORT');
 
-  const customLogger = new CustomLoggerService(configService);
+  const customLogger = app.get(CustomLoggerService);
   app.useLogger(customLogger);
 
   const rootDirname = dirname(__dirname);
