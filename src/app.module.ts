@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
@@ -8,14 +8,22 @@ import { AlbumModule } from './album/album.module';
 import { FavouritesModule } from './favourites/favourites.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { CurrentUserMiddleware } from './auth/middlewares/current-user.middleware';
+import { AuthGuard } from './auth/guards/auth.guard';
+import { LoggerModule } from './logger/logger.module';
+import { LoggerMiddleware } from './logger/logger.middleware';
+import { HttpExceptionFilter } from './filters/http-exception-filter';
 
 @Module({
   imports: [
-    forwardRef(() => UserModule),
-    forwardRef(() => ArtistModule),
-    forwardRef(() => TrackModule),
-    forwardRef(() => AlbumModule),
-    forwardRef(() => FavouritesModule),
+    UserModule,
+    ArtistModule,
+    TrackModule,
+    AlbumModule,
+    FavouritesModule,
+    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -34,12 +42,29 @@ import { TypeOrmModule } from '@nestjs/typeorm';
           entities: [__dirname + 'dist/**/*.entity{.ts,.js}'],
           synchronize: true,
           autoLoadEntities: true,
-          logging: true,
+          // logging: true,
         };
       },
     }),
+    LoggerModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+    // { provide: APP_INTERCEPTOR, useClass: CurrentUserInterceptor },
+  ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(CurrentUserMiddleware).forRoutes('*');
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}

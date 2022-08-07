@@ -1,22 +1,26 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { User } from '../user.entity';
 import { CreateUserDto } from '../dtos/CreateUserDto';
 import { UpdateUserDto } from '../dtos/UpdateUserDto';
 import { UserDto } from '../dtos/UserDto';
-import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
+import { CryptService } from '../../auth/services/crypt.service';
 
 @Injectable()
 export class UserService {
+  private readonly saltRound: number;
+
   constructor(
     @InjectRepository(User)
     private userRepo: Repository<User>,
-  ) {}
+    private cryptService: CryptService,
+    private configService: ConfigService,
+  ) {
+    const CRYPT_SALT = +this.configService.get<string>('CRYPT_SALT');
+    this.saltRound = isNaN(CRYPT_SALT) ? 10 : CRYPT_SALT;
+  }
 
   async getAll(): Promise<User[]> {
     return await this.userRepo.find();
@@ -27,11 +31,9 @@ export class UserService {
   }
 
   async createUser(user: CreateUserDto): Promise<User> {
-    // const hashPassword = await this.hashPassword(user.password);
-
     const newUser: UserDto = this.userRepo.create({
       ...user,
-      // password: hashPassword,
+      password: this.cryptService.hashPassword(user.password),
       version: 1,
     });
     return await this.userRepo.save(newUser);
@@ -43,23 +45,19 @@ export class UserService {
       return null;
     }
 
-    // const isPasswordsEqual = await this.comparePasswords(
-    //   user.oldPassword,
-    //   userInDb.password,
-    // );
+    const isPasswordsEqual = this.cryptService.comparePasswords(
+      user.oldPassword,
+      userInDb.password,
+    );
 
-    // if (!isPasswordsEqual) {
-    //   throw new ForbiddenException('Old password is incorrect');
-    // }
-
-    if (userInDb.password !== user.oldPassword) {
-      throw new ForbiddenException('New password is incorrect');
+    if (!isPasswordsEqual) {
+      throw new ForbiddenException('Password is incorrect');
     }
 
     const newUser: User = this.userRepo.create({
       ...userInDb,
       id,
-      password: user.newPassword,
+      password: this.cryptService.hashPassword(user.newPassword),
       version: (userInDb.version += 1),
     });
     return await this.userRepo.save(newUser);
@@ -75,15 +73,7 @@ export class UserService {
     return userInDb;
   }
 
-  private async hashPassword(password: string): Promise<string> {
-    const salt = await bcrypt.genSalt();
-    return await bcrypt.hash(password, salt);
-  }
-
-  private async comparePasswords(
-    newPassword: string,
-    hashOldPassword: string,
-  ): Promise<boolean> {
-    return await bcrypt.compare(newPassword, hashOldPassword);
+  async find(login: string) {
+    return await this.userRepo.findOne({ where: { login } });
   }
 }
