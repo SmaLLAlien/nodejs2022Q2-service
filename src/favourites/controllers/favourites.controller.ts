@@ -15,8 +15,8 @@ export class FavouritesController {
   constructor(private favsService: FavouritesService) {}
 
   @Get()
-  getAllFavourites() {
-    return this.favsService.getAllFavourites();
+  async getAllFavourites() {
+    return await this.favsService.getAllFavourites();
   }
 
   @Post('artist/:id')
